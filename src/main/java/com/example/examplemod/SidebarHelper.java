@@ -2,12 +2,35 @@ package com.example.examplemod;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.scoreboard.*;
+import net.minecraft.util.EnumChatFormatting;
 import net.minecraft.world.World;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class SidebarHelper {
-
+    /**
+     * 获取侧边栏纯文本标题（无颜色符号）
+     */
+    public static String getSidebarTitlePlain() {
+        World world = Minecraft.getMinecraft().theWorld;
+        if (world == null) return "";
+        ScoreObjective obj = world.getScoreboard().getObjectiveInDisplaySlot(1);
+        if (obj == null) return "";
+        // 去掉 § 颜色代码
+        return EnumChatFormatting.getTextWithoutFormattingCodes(obj.getDisplayName());
+    }
+    /**
+     * 获取侧边栏所有行，并移除所有颜色/格式代码。
+     */
+    public static List<String> getSidebarLinesPlain() {
+        List<String> formattedLines = getSidebarLines(); // 调用原来的方法
+        List<String> plainLines = new ArrayList<>();
+        for (String line : formattedLines) {
+            // 去掉所有 § 开头的格式符，只保留显示文字
+            plainLines.add(EnumChatFormatting.getTextWithoutFormattingCodes(line));
+        }
+        return plainLines;
+    }
     public static List<String> getSidebarLines() {
         // 获取客户端世界（适用于单人/多人）
         World world = Minecraft.getMinecraft().theWorld;

@@ -15,8 +15,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import org.lwjgl.input.Keyboard;
 
 import java.util.Collection;
+import java.util.Objects;
 
-import static com.example.examplemod.SidebarHelper.getSidebarLines;
+import static com.example.examplemod.SidebarHelper.*;
 
 public class LobbyChecker {
     public static  String lobbyName="Not In Game";
@@ -33,7 +34,8 @@ public class LobbyChecker {
             mc.ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(lobbyName));
         }
         if(Keyboard.isKeyDown(Keyboard.KEY_H)){
-            for (String s:getSidebarLines()){
+            mc.ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(getSidebarTitlePlain()));
+            for (String s:getSidebarLinesPlain()){
                 mc.ingameGUI.getChatGUI().printChatMessage(new ChatComponentText(s));
             }
         }
@@ -51,10 +53,17 @@ public class LobbyChecker {
             return;
         }
         Scoreboard scoreboard=world.getScoreboard();
-        Collection<String> strings=scoreboard.getObjectiveNames();
-        if(strings.isEmpty()){
+        ScoreObjective obj = world.getScoreboard().getObjectiveInDisplaySlot(1);
+        if(obj==null){
             lobbyName="Vanilla";
             return;
         }
+        String sidebarTitle=getSidebarTitlePlain();
+        if(Objects.equals(sidebarTitle, "THE HYPIXEL PIT")){
+            lobbyName="HYPIXEL PIT";
+            return;
+        }
+        lobbyName="Not In Hypixel Pit";
+        return;
     }
 }
