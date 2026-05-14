@@ -150,17 +150,27 @@ public class PathFinder {
 
         return ret;
     }
+    public static boolean isCollisionBlock(World world ,BlockPos pos){
+        if (world.getBlockState(pos).getBlock()!=Blocks.air
+                ||world.getBlockState(pos).getBlock().getCollisionBoundingBox(world, pos, world.getBlockState(pos))!=null) {
+            return true;
+        }else{
+            return false;
+        }
+    }
     /**
      * 检查位置是否可以站立（需要有2格高空间）
      */
     public static boolean isStandable(World world, BlockPos pos){
         // 检查当前位置是否为空气
-        if (world.getBlockState(pos).getBlock() != Blocks.air) {
+        if (world.getBlockState(pos).getBlock()!=Blocks.air
+                ||world.getBlockState(pos).getBlock().getCollisionBoundingBox(world, pos, world.getBlockState(pos))!=null) {
             return false;
         }
 
         // 检查上方是否为空气（玩家需要2格高的空间）
-        if (world.getBlockState(pos.up()).getBlock() != Blocks.air) {
+        if (world.getBlockState(pos.up()).getBlock()!=Blocks.air
+                ||world.getBlockState(pos.up()).getBlock().getCollisionBoundingBox(world, pos.up(), world.getBlockState(pos.up()))!=null) {
             return false;
         }
 
@@ -178,7 +188,7 @@ public class PathFinder {
 
         // 检查下方是否有实体方块支撑
         BlockPos below = pos.down();
-        return world.getBlockState(below).getBlock().isNormalCube();
+        return isCollisionBlock(world, below);
     }
     /**
      * 启发式函数：曼哈顿距离（适用于网格移动）,ai生成
