@@ -92,6 +92,21 @@ public class PathFinder {
                 pos.west().north(), pos.west().south()
         };
 
+        BlockPos[] allDirections = {
+                pos.east(), pos.west(), pos.north(), pos.south(),
+                pos.east().north(), pos.east().south(),
+                pos.west().north(), pos.west().south()
+        };
+        for (BlockPos neighbor : directions) {
+            if(isWalkable(world, neighbor.up())){
+                ret.add(pos.up());
+                break;
+            }
+        }
+        if(isStandable(world, pos.down())){
+            ret.add(pos.down());
+        }
+
         // 处理基本方向
         for (BlockPos neighbor : directions) {
             // 检查同一高度是否可行走（需要有支撑）
