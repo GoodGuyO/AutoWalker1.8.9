@@ -2,6 +2,7 @@ package com.example.examplemod.mixins;
 
 import com.example.examplemod.AutoWalk.AutoWalker;
 import com.example.examplemod.AutoWalk.PathFinder;
+import com.example.examplemod.AutoWalk.WalkBlockRenderer;
 import com.example.examplemod.LobbyChecker;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
@@ -16,5 +17,6 @@ public class MixinMinecraft {
         new LobbyChecker();
         new PathFinder();
         AutoWalker.autoWalker=new AutoWalker();
+        new WalkBlockRenderer();
     }
 }

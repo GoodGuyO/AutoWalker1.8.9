@@ -23,7 +23,7 @@ public class PathFinder {
         openList.add(startNode);
         allNodes.put(start, startNode);
 
-        int maxIterations = 1000; // 增加最大迭代次数
+        int maxIterations = 20000; // 增加最大迭代次数
         int iterations = 0;
 
         while (!openList.isEmpty() && iterations < maxIterations) {
@@ -98,7 +98,7 @@ public class PathFinder {
                 pos.west().north(), pos.west().south()
         };
         for (BlockPos neighbor : directions) {
-            if(isWalkable(world, neighbor.up())){
+            if(isWalkable(world, neighbor.up())&&!isStandableBlock(world, pos.down())){
                 ret.add(pos.up());
                 break;
             }
@@ -115,8 +115,10 @@ public class PathFinder {
             }
 
             // 检查是否可以向上移动（向上一格）
-            if (isWalkable(world, neighbor.up()) && isStandable(world, pos.up())) {
-                ret.add(neighbor.up());
+            if(!isStandableBlock(world, pos.down())){
+                if (isWalkable(world, neighbor.up()) && isStandable(world, pos.up())) {
+                    ret.add(neighbor.up());
+                }
             }
 
             // 检查是否可以向下移动（向下一格）
@@ -153,8 +155,10 @@ public class PathFinder {
                 ret.add(diagonal);
 
                 // 对角线也可以向上移动
-                if (isWalkable(world, diagonal.up()) && isStandable(world, pos.up())) {
-                    ret.add(diagonal.up());
+                if(!isStandableBlock(world, pos.down())){
+                    if (isWalkable(world, diagonal.up()) && isStandable(world, pos.up())) {
+                        ret.add(diagonal.up());
+                    }
                 }
                 // 对角线也可以向下移动
                 if (isStandable(world, diagonal.down())) {
@@ -171,6 +175,14 @@ public class PathFinder {
             return true;
         }else{
             return false;
+        }
+    }
+    public static boolean isStandableBlock(World world, BlockPos pos){
+        if (world.getBlockState(pos).getBlock()!=Blocks.air
+                ||world.getBlockState(pos).getBlock().getCollisionBoundingBox(world, pos, world.getBlockState(pos))!=null) {
+            return false;
+        }else{
+            return true;
         }
     }
     /**
