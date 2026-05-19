@@ -97,6 +97,10 @@ public class PathFinder {
     }
     public static HashSet<BlockPos> getNeighbors(World world, BlockPos pos){
         HashSet<BlockPos> ret = new HashSet<>();
+        if(isWater(world, pos)){
+            ret.add(pos.up());
+            return ret;
+        }
 
         // 四个基本方向（东西南北）
         BlockPos[] directions = {
@@ -172,12 +176,12 @@ public class PathFinder {
         if(world.getBlockState(pos).getBlock()==Blocks.air
         ||world.getBlockState(pos).getBlock().getCollisionBoundingBox(world, pos, world.getBlockState(pos))==null
         ||(world.getBlockState(pos).getBlock().getCollisionBoundingBox(world, pos, world.getBlockState(pos)).maxY==world.getBlockState(pos).getBlock().getCollisionBoundingBox(world, pos, world.getBlockState(pos)).minY
-        &&world.getBlockState(pos).getBlock()!=Blocks.water&&world.getBlockState(pos).getBlock()!=Blocks.flowing_water)){
+        )){
             return false;
         }else{
-            if (world.getBlockState(pos).getBlock() instanceof BlockStairs) {
+            /*if (world.getBlockState(pos).getBlock() instanceof BlockStairs) {
                 return false;
-            }
+            }*/
             if (world.getBlockState(pos).getBlock() instanceof BlockSlab) {
                 return false;
             }
@@ -214,7 +218,11 @@ public class PathFinder {
 
         // 检查下方是否有实体方块支撑
         BlockPos below = pos.down();
-        return isCollisionBlock(world, below);
+        return isCollisionBlock(world, below)||isWater(world, below);
+    }
+    public static boolean isWater(World world, BlockPos pos){
+        return world.getBlockState(pos).getBlock()==Blocks.water
+                || world.getBlockState(pos).getBlock()==Blocks.flowing_water;
     }
     /**
      * 启发式函数：曼哈顿距离（适用于网格移动）,ai生成
