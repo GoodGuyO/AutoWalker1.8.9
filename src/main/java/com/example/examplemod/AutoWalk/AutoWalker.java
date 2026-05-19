@@ -22,6 +22,14 @@ public class AutoWalker {
     LinkedList<BlockPos> currentPath=null;
     public BlockPos target=null;
 
+    public boolean isFollowing() {
+        return isFollowing;
+    }
+
+    public void setFollowing(boolean following) {
+        isFollowing = following;
+    }
+
     // 追随玩家相关字段
     boolean isFollowing=false;
     EntityPlayer targetPlayer=null;
@@ -129,15 +137,24 @@ public class AutoWalker {
             }
         }
 
+        gotoNextBlock();
+    }
+    public void gotoNextBlock(){
         // 获取下一个目标方块
+        Minecraft mc = Minecraft.getMinecraft();
+        BlockPos blockpos = new BlockPos(mc.getRenderViewEntity().posX, mc.getRenderViewEntity().getEntityBoundingBox().minY, mc.getRenderViewEntity().posZ);
         int currentIndex = currentPath.indexOf(blockpos);
         if (currentIndex >= 0 && currentIndex < currentPath.size() - 1) {
             BlockPos next = currentPath.get(currentIndex + 1);
+            if(next.getY()!=blockpos.getY()){
+                if(currentPath.size()>=currentIndex + 1 + 2){
+                    next=currentPath.get(currentIndex + 2);
+                }
+            }
             // 转向下一个方块
-            float targetYaw = getYawRotToBLockPos(player, next);
+            float targetYaw = getYawRotToBLockPos(mc.thePlayer, next);
             float targetPitch = 0.0f;
             setTargetAngles(targetYaw, targetPitch);
-            //player.rotationYaw = smoothRotation(player.rotationYaw, getYawRotToBLockPos(player, next));
 
             // 判断是否需要跳跃（下一个方块比当前高）
             needsJump = next.getY() > blockpos.getY();
@@ -167,16 +184,6 @@ public class AutoWalker {
         BlockPos currentPlayerPos = getPlayerBlockPos(player);
         BlockPos targetPos = getPlayerBlockPos(targetPlayer);
 
-        /*// 计算与目标玩家的距离
-        double distance = player.getDistanceSqToEntity(targetPlayer);
-
-        // 如果距离足够近（2格以内），停止移动
-        if(distance <= 4.0){
-            currentPath=null;
-            needsJump=false;
-            return;
-        }*/
-
         // 每隔一定间隔更新路径
         followUpdateCounter++;
         if(followUpdateCounter>=FOLLOW_UPDATE_INTERVAL || currentPath==null || currentPath.isEmpty()){
@@ -196,25 +203,7 @@ public class AutoWalker {
         }
 
         // 沿着路径移动
-        if(currentPath!=null && !currentPath.isEmpty()){
-            BlockPos blockpos = new BlockPos(mc.getRenderViewEntity().posX, mc.getRenderViewEntity().getEntityBoundingBox().minY, mc.getRenderViewEntity().posZ);
-
-            int currentIndex = currentPath.indexOf(blockpos);
-            if (currentIndex >= 0 && currentIndex < currentPath.size() - 1) {
-                BlockPos next = currentPath.get(currentIndex + 1);
-                // 转向下一个方块
-                float targetYaw = getYawRotToBLockPos(player, next);
-                float targetPitch = 0.0f;
-                setTargetAngles(targetYaw, targetPitch);
-                //player.rotationYaw = smoothRotation(player.rotationYaw, getYawRotToBLockPos(player, next));
-
-                // 判断是否需要跳跃
-                needsJump = next.getY() > blockpos.getY();
-            } else {
-                // 如果当前位置不在路径上，重新计算路径
-                currentPath = PathFinder.findPath(mc.theWorld, currentPlayerPos, targetPos);
-            }
-        }
+        gotoNextBlock();
     }
 
     //返回实体看向方块所需的横向角度,这个函数是ai写的

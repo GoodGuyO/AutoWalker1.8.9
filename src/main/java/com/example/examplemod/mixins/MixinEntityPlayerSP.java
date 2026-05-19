@@ -23,10 +23,11 @@ public class MixinEntityPlayerSP {
             at = @At("TAIL")
     )
     private void onUpdateWalkingPlayerTail(CallbackInfo ci) {
-        if (AutoWalker.autoWalker != null && AutoWalker.autoWalker.isWalking()) {
+        if (AutoWalker.autoWalker != null &&
+                (AutoWalker.autoWalker.isWalking()||AutoWalker.autoWalker.isFollowing())) {
             float[] angles = AutoWalker.autoWalker.getTargetAngles();
             if (angles != null) {
-                ((EntityPlayerSP)(Object)this).rotationYaw = smoothRotation(((EntityPlayerSP)(Object)this).rotationYaw, angles[0]);
+                ((EntityPlayerSP)(Object)this).rotationYaw = smoothRotation(((EntityPlayerSP)(Object)this).rotationYaw, angles[0])%360f;
                 ((EntityPlayerSP)(Object)this).rotationPitch = angles[1];
             }
         }
@@ -155,7 +156,7 @@ public class MixinEntityPlayerSP {
     }
 
     // 平滑转头相关字段
-    private static final float MAX_YAW_CHANGE_PER_TICK = 30.0f; // 每tick最大转向角度
+    private static final float MAX_YAW_CHANGE_PER_TICK = 10.0f; // 每tick最大转向角度
 
     /**
      * 平滑旋转：将当前角度逐步转向目标角度
